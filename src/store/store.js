@@ -93,8 +93,11 @@ export const store = new Vuex.Store({
 		}
 	},
 	mutations: {
-		updateLogin: (state, payload) => {
+		login: (state, payload) => {
 			state.isloggedin = payload;
+		},
+		logoff: (state, payload) => {
+			state.isloggedin = false;
 		},
 		updateMember: (state, payload) => {
 			state.member = payload;
@@ -113,13 +116,16 @@ export const store = new Vuex.Store({
 		}
 	},
 	actions: {
-		asyncupdateLogin: ({ commit }, payload) => {
+		asynclogin: ({ commit }, payload) => {
 			setTimeout(() => {
-				commit('updateLogin', payload.by);
+				commit('login', payload.by);
 			}, payload.duration);
 		},
-		updateLogin({ commit }, payload)  {
-			commit('updateLogin', payload);
+		login({ commit }, payload)  {
+			commit('login', payload);
+		},
+		logoff({ commit }, payload)  {
+			commit('logoff', payload);
 		},
 		updateMember: ({ commit }, payload) => {
 			commit('updateMember', payload);

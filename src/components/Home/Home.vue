@@ -8,18 +8,27 @@
 				<app-welcome class='componentPadding'></app-welcome>
 				<app-login 
 					v-if="!memberLoggedIn" 
-					@loginSuccesseful="memberIsLoggedin($event)"
-					:isloggedin='isloggedin'
+					@loginSuccessful="loginMember($event)"
 					class='componentPadding'></app-login>
 				<app-member-avatar-show 
 					v-if="memberLoggedIn" 
 					:member="member"
 					class='componentPadding'></app-member-avatar-show>
+				<app-logoff 
+					v-if="memberLoggedIn" 
+					@logoffSuccessful="logoffMember($event)"
+					class='componentPadding'></app-logoff>	
 			</b-col>
 			<b-col cols="6">
 				<app-news-opinion></app-news-opinion>
 			</b-col>
 		</b-row>
+
+		<b-modal v-model="modalShowMessage" :title="modalTitle">
+			<div class="d-block text-center">
+				<span>{{ modalMessage }}</span>
+			</div>
+	    </b-modal>
 	</b-container>	
 </template>
 
@@ -29,13 +38,17 @@ import MainPicture from './MainPicture.vue'
 import Welcome from './Welcome.vue'
 import NewsOpinion from './NewsOpinion.vue'
 import Login from './Login.vue'
+import Logoff from './Logoff.vue'
 import MemberAvatarShow from './MemberAvatarShow'
 
 export default {
 	data: function () {
 		return {
 			member: {},
-			memberLoggedIn: false
+			memberLoggedIn: false,
+			modalShowMessage: false,
+			modalMessage: "",
+			modalTitle: ""
 		}
 	},
     components: {
@@ -44,27 +57,64 @@ export default {
         appWelcome: Welcome,
         appNewsOpinion: NewsOpinion,
         appLogin: Login,
+        appLogoff: Logoff,
         appMemberAvatarShow: MemberAvatarShow
     },
     computed: {
       	isloggedin() {
-	            return this.$store.getters.isloggedin;
-			}
+            return this.$store.getters.isloggedin;
+		}
 	},
 	methods: {
-		memberIsLoggedin(event) {
-			this.$store.dispatch('updateLogin', event);
-
-			this.member = event;
-			this.$store.dispatch('updateMember', event);
-
-			if (event == "")
+		logoffMember(event) {
+			if (event == true)
 			{
+				this.$store.dispatch('logoff', event);
+
+				this.member = "";
+				this.$store.dispatch('updateMember', this.member);
 				this.memberLoggedIn = false;
+
+				// modal window management
+				this.modalMessage = "Logoff Successful!";
+				this.modalTitle = "Logoff Status";
+				this.modalShowMessage = true;
 			}
 			else
 			{
 				this.memberLoggedIn = true;
+
+				// modal window management
+				this.modalTitle = "Logoff Status";
+				this.modalMessage = "Logoff NOT Successful!";
+				this.modalShowMessage = true;
+			}
+			
+		},
+		loginMember(event) {
+			console.log("in login member. event="+event);
+			if (event == "")
+			{
+				this.member = "";
+				this.$store.dispatch('login', this.member);
+				this.memberLoggedIn = false;
+
+				// modal window management
+				this.modalTitle = "Logon Status";
+				this.modalMessage = "Logon NOT Successful!";
+				this.modalShowMessage = true;
+			}
+			else
+			{
+				this.member = event.member;
+				this.$store.dispatch('updateMember', this.member);
+
+				this.memberLoggedIn = true;
+
+				// modal window management
+				this.modalTitle = "Logon Status";
+				this.modalMessage = event.text;
+				this.modalShowMessage = true;
 			}
 			
 		}
@@ -81,7 +131,7 @@ export default {
 
 			console.log("store: "+this.$store);
 
-			this.$store.dispatch('updateLogin', true);
+			this.$store.dispatch('login', true);
 			this.$store.dispatch('updateMember', member);
 
 			this.memberLoggedIn = true;

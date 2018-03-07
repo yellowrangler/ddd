@@ -61,13 +61,11 @@ export default {
 
 				if (msg.rc == 1)
 				{
-		        	this.$emit('loginSuccesseful', msg.member);
-		        	alert(msg.text);
+		        	this.$emit('loginSuccessful', msg);
 				}
 				else
 				{
-					this.$emit('loginSuccesseful', "");
-					alert(msg.text);
+					this.$emit('loginSuccessful', "");
 				}
 					
 			})
